@@ -1,3 +1,5 @@
+Gradescope Autograder shell for C++
+
 ## Adding Tests
 
 1. Create a new directory under `/autograder/tests` with all the required test files.
