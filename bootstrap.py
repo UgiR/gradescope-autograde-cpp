@@ -1,3 +1,5 @@
+import subprocess
+
 #  Code to be executed before the tests are run
 def init():
     #  3. compile Catch once so we are not recompiling for each test
