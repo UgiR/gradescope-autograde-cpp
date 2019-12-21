@@ -45,3 +45,7 @@ Files:
 
 As specified above, the files listed in `config.yml` are moved into `/autograder/tests`. In the context of any
 individual test directory, these files are found in its parent directory.
+
+### Example output
+
+![Gradescope output](https://i.imgur.com/v7RytqQ.png)
