@@ -48,4 +48,4 @@ individual test directory, these files are found in its parent directory.
 
 ### Example output
 
-![Gradescope output](https://i.imgur.com/v7RytqQ.png)
+![Gradescope output](https://i.imgur.com/nESCZAS.png)
