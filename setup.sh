@@ -15,3 +15,4 @@ apt-get install catch -y
 # Move python uploaded grader files into the same directory as run_autograder
 cp /autograder/source/grade_util.py /autograder
 cp /autograder/source/bootstrap.py /autograder
+cp /autograder/source/config.yml /autograder

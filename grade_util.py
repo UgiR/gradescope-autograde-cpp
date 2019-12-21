@@ -4,10 +4,14 @@ import json
 from pathlib import Path
 
 
+FNULL = open(os.devnull, 'w')
+
+
 class Config:
     SUBMITTED_SOURCE = '/autograder/submission'
     SUBMISSION_META_FILE = '/autograder/submission_metadata.json'
     RESULTS_FILE = '/autograder/results/results.json'
+    TEST_DIR = '/autograder/source/tests'  #  directory where all tests reside
 
 
 def file_exists(path: str) -> bool:
