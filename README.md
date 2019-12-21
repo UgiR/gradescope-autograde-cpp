@@ -1,5 +1,7 @@
 # Gradescope Autograder for C++
 
+[autograder.zip](https://github.com/UgiR/gradescope-autograde-cpp/raw/master/autograder.zip)
+
 ### Configuration
 
 In `config.yml`, define all files that must be submitted by the student.
