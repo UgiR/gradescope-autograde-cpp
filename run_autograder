@@ -6,11 +6,12 @@ import os
 import stat
 import glob
 import yaml
+import json
 import subprocess
 import unittest
 from typing import List
 
-from gradescope_utils.autograder_utils.decorators import weight
+from gradescope_utils.autograder_utils.decorators import weight, leaderboard
 from gradescope_utils.autograder_utils.json_test_runner import JSONTestRunner
 
 ZERO_LEADERBOARD = [
@@ -30,7 +31,7 @@ def BAD_FORMAT(file):
         'stdout_visibility': 'hidden',
         'output': 'Expecting the file \'{0}\', either no .h file was submitted or filename was not \'{0}\'.'
             .format(file),
-        'loaderboard': ZERO_LEADERBOARD
+        'leaderboard': ZERO_LEADERBOARD
     }
 
 
@@ -92,6 +93,13 @@ def run_tests():
 
     with open(gu.Config.RESULTS_FILE, 'w+') as result_stream:
         JSONTestRunner(stdout_visibility='hidden', visibility='visible', stream=result_stream).run(suite)
+        result_stream.seek(0)
+        data = json.load(result_stream)
+        final_score = data.get('score', 0.0)
+        data['leaderboard'] = [{'name': 'Score', 'value': final_score}]
+        result_stream.truncate(0)
+        result_stream.seek(0)
+        json.dump(data, result_stream)
 
 
 #  Execution begins here
