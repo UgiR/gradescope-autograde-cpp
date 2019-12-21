@@ -16,7 +16,7 @@ if __name__ == '__main__':
         print(e.output)
         exit(-1)
 
-    if 'All heap blocks were freed' in str(output):
+    if 'All heap blocks were freed' in output.decode():
         exit(0)
     else:
         print(output.decode())
