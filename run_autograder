@@ -63,7 +63,7 @@ def generate_test(dir_name):
             subprocess.check_call(['dos2unix', 'run_test'], cwd=os.path.join(gu.Config.TEST_DIR, dir_name),
                                   stdout=gu.FNULL)
             subprocess.check_output(['./run_test'], cwd=os.path.join(gu.Config.TEST_DIR, dir_name),
-                                    stderr=subprocess.PIPE)
+                                    stderr=subprocess.STDOUT)
         else:
             raise Exception('Test improperly configured: missing \'run_test\' executable')
 
