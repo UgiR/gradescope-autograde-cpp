@@ -75,7 +75,7 @@ def generate_test(dir_name):
             run_test()
         except subprocess.CalledProcessError as e:  # test script returned non-zero
             msg = '{}\n\n{}'.format(settings.get('message', ''),
-                                    e.output.decode()) if settings.get('show_output', True) else ''
+                                    e.output.decode() if settings.get('show_output', True) else '')
             raise Exception(msg)
 
     wrapper.__doc__ = '{}'.format(settings.get('name', os.path.basename(dir_name)))
