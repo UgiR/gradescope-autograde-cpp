@@ -1,4 +1,4 @@
 weight: 10.0
 name: 'Example runtime complexity test'
 message: 'Your implementation must run in linear time'
-show_output: true
+show_output: false

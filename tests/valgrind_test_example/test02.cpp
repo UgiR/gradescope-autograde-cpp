@@ -4,4 +4,5 @@
 TEST_CASE( "Test 02", "Example Project" )
 {
   int *arr = new int[10];
+  delete arr;
 }
