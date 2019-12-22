@@ -9,6 +9,7 @@ In `config.yml`, define all files that must be submitted by the student.
 Example `config.yml`:
 
 ```
+limit_submissions: -1  # limit number of submissions accepted. Set to -1 for unlimited (default: -1)
 required_files:
   - student_file.h
 ```

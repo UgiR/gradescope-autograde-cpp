@@ -1,2 +1,3 @@
+limit_submissions: 10
 required_files:
   - student_file.h

@@ -18,21 +18,26 @@ ZERO_LEADERBOARD = [
     {
         'name': 'Score',
         'value': 0
-    },
-    {
-        'name': 'Stars',
-        'value': ''
     }
 ]
 
-def BAD_FORMAT(file):
+def ZERO_RESULT(msg):
     return {
         'score': 0.0,
         'stdout_visibility': 'hidden',
-        'output': 'Expecting the file \'{0}\', either no .h file was submitted or filename was not \'{0}\'.'
-            .format(file),
+        'output': msg,
         'leaderboard': ZERO_LEADERBOARD
     }
+
+def BAD_FORMAT(file):
+    return ZERO_RESULT('Expecting the file \'{0}\', either no .h file was submitted or filename was not \'{0}\'.'
+            .format(file))
+
+def SUBMISSIONS_EXCEEDED(limit):
+    return ZERO_RESULT('Exceeded maximum number of submissions: {}'.format(limit))
+
+def NUM_SUBMISSIONS_INFO(num, limit):
+    return ZERO_RESULT('Submission {} out of {}'.format(num, limit))
 
 
 #  class used in generating unittest TestCase's
@@ -82,7 +87,7 @@ def generate_test(dir_name):
     return wrapper
 
 
-def run_tests():
+def run_tests(pending_messages):
     suite = unittest.TestSuite()
 
     #  go through all directories in /tests
@@ -97,6 +102,10 @@ def run_tests():
         data = json.load(result_stream)
         final_score = data.get('score', 0.0)
         data['leaderboard'] = [{'name': 'Score', 'value': final_score}]
+        if 'tests' not in data:
+            data['tests'] = []
+        for msg in pending_messages:
+            data['tests'].insert(0, msg)
         result_stream.truncate(0)
         result_stream.seek(0)
         json.dump(data, result_stream)
@@ -105,7 +114,19 @@ def run_tests():
 #  Execution begins here
 if __name__ == '__main__':
     bootstrap.init()
+
+    pending_messages = []
     config = load_yaml('config.yml')
+
+    limit = config.get('limit_submissions', -1)
+    if limit is not -1:
+        num_submissions = gu.number_submissions()
+        if num_submissions > limit:
+            gu.write_result(**SUBMISSIONS_EXCEEDED(limit))
+            exit(0)
+        else:
+            pending_messages.append((NUM_SUBMISSIONS_INFO(num_submissions, limit)))
+
     for file in config.get('required_files', []):
         #  check if required file is submitted
         if not gu.is_submitted(file):
@@ -114,4 +135,4 @@ if __name__ == '__main__':
         #  copy submitted file to shared test directory
         shutil.copy(os.path.join(gu.Config.SUBMITTED_SOURCE, file), gu.Config.TEST_DIR)
 
-    run_tests()
+    run_tests(pending_messages)
