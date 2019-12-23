@@ -9,10 +9,15 @@ import yaml
 import json
 import subprocess
 import unittest
+import logging
 from typing import List
 
 from gradescope_utils.autograder_utils.decorators import weight
 from gradescope_utils.autograder_utils.json_test_runner import JSONTestRunner
+
+logging.basicConfig()
+LOGGER = logging.getLogger('autograder')
+LOGGER.setLevel(logging.INFO)
 
 ZERO_LEADERBOARD = [
     {
@@ -56,19 +61,23 @@ def get_test_dirs() -> List[str]:
 
 
 def load_yaml(file: str):
-    with open(file, 'w+') as f:
-        return yaml.safe_load(f) or {}
+    try:
+        with open(file, 'r') as f:
+            return yaml.safe_load(f) or {}
+    except FileNotFoundError:
+        return {}
 
 
 def generate_test(dir_name):
     settings = load_yaml(os.path.join(gu.Config.TEST_DIR, dir_name, 'test.yml'))
+    LOGGER.info('Generating test \'{}\''.format(settings.get('name', '')))
 
     def run_test():
         run_path = os.path.join(gu.Config.TEST_DIR, dir_name, 'run_test')
         if gu.file_exists(run_path):
             os.chmod(run_path, os.stat(run_path).st_mode | stat.S_IEXEC)
             subprocess.check_call(['dos2unix', 'run_test'], cwd=os.path.join(gu.Config.TEST_DIR, dir_name),
-                                  stdout=gu.FNULL)
+                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             subprocess.check_output(['./run_test'], cwd=os.path.join(gu.Config.TEST_DIR, dir_name),
                                     stderr=subprocess.STDOUT, timeout=settings.get('timeout', None))
         else:
@@ -96,23 +105,29 @@ def run_tests(pending_messages):
 
     #  go through all directories in /tests
     for dr in get_test_dirs():
+        LOGGER.info('Test directory discovered: {}'.format(dr))
         test_fn = generate_test(dr)
         t = Test(test_fn, (unittest.TestCase,), {})
         suite.addTest(t(test_fn.__doc__))
 
     with open(gu.Config.RESULTS_FILE, 'w+') as result_stream:
         JSONTestRunner(stdout_visibility='hidden', visibility='visible', stream=result_stream).run(suite)
-        result_stream.seek(0)
-        data = json.load(result_stream)
+
+        LOGGER.info('Adding final score to leaderboard')
+        result_stream.seek(0)  # reset file pointer
+        data = json.load(result_stream)  # load contents to JSON
         final_score = data.get('score', 0.0)
         data['leaderboard'] = [{'name': 'Score', 'value': final_score}]
+
+        LOGGER.info('Prepending additional messages to output')
         if 'tests' not in data:
             data['tests'] = []
         for msg in pending_messages:
             data['tests'].insert(0, msg)
         result_stream.truncate(0)
         result_stream.seek(0)
-        json.dump(data, result_stream)
+
+        json.dump(data, result_stream)  # rewrite JSON to file
 
 
 #  Execution begins here
@@ -120,23 +135,29 @@ if __name__ == '__main__':
     bootstrap.init()
 
     pending_messages = []
+    LOGGER.info('Loading config.yml file')
     config = load_yaml('config.yml')
 
     limit = config.get('limit_submissions', -1)
+    LOGGER.info('Using submission limit: {}'.format(limit))
     if limit is not -1:
         num_submissions = gu.number_submissions()
         if num_submissions > limit:
+            LOGGER.info('Submission limit reached. Observed submissions: {}'.format(num_submissions))
             gu.write_result(**SUBMISSIONS_EXCEEDED(limit))
             exit(0)
         else:
             pending_messages.append((NUM_SUBMISSIONS_INFO(num_submissions, limit)))
 
     for file in config.get('required_files', []):
+        LOGGER.info('Attempting to load file: {}'.format(file))
         #  check if required file is submitted
         if not gu.is_submitted(file):
+            LOGGER.info('File not submitted: {}'.format(file))
             gu.write_result(**BAD_FORMAT(file))
             exit(0)
         #  copy submitted file to shared test directory
+        LOGGER.info('Copying file to test directory: {}'.format(file))
         shutil.copy(os.path.join(gu.Config.SUBMITTED_SOURCE, file), gu.Config.TEST_DIR)
 
     run_tests(pending_messages)

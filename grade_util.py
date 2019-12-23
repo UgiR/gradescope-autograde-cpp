@@ -4,9 +4,6 @@ import json
 from pathlib import Path
 
 
-FNULL = open(os.devnull, 'w')
-
-
 class Config:
     SUBMITTED_SOURCE = '/autograder/submission'
     SUBMISSION_META_FILE = '/autograder/submission_metadata.json'
