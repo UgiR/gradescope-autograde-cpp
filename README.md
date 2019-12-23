@@ -40,6 +40,7 @@ Files:
     name: 'BST balancing'  # (default: '')
     message: 'insert() must maintain a balanced BST'  # (default: '')
     show_output: false  # whether to display stdout/stderr output on failure (default: true)
+    timeout: 10  # test fails if it does not finish running in 10 seconds (default: None)
     ```
 
 * Any other files that `run_test` requires.

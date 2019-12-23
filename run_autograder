@@ -61,6 +61,8 @@ def load_yaml(file: str):
 
 
 def generate_test(dir_name):
+    settings = load_yaml(os.path.join(gu.Config.TEST_DIR, dir_name, 'test.yml'))
+
     def run_test():
         run_path = os.path.join(gu.Config.TEST_DIR, dir_name, 'run_test')
         if gu.file_exists(run_path):
@@ -68,19 +70,21 @@ def generate_test(dir_name):
             subprocess.check_call(['dos2unix', 'run_test'], cwd=os.path.join(gu.Config.TEST_DIR, dir_name),
                                   stdout=gu.FNULL)
             subprocess.check_output(['./run_test'], cwd=os.path.join(gu.Config.TEST_DIR, dir_name),
-                                    stderr=subprocess.STDOUT)
+                                    stderr=subprocess.STDOUT, timeout=settings.get('timeout', None))
         else:
             raise Exception('Test improperly configured: missing \'run_test\' executable')
 
-    settings = load_yaml(os.path.join(gu.Config.TEST_DIR, dir_name, 'test.yml'))
-
     @weight(settings.get('weight', 1))
     def wrapper(self):
+        show_output = settings.get('show_output', True)
         try:
             run_test()
         except subprocess.CalledProcessError as e:  # test script returned non-zero
             msg = '{}\n\n{}'.format(settings.get('message', ''),
-                                    e.output.decode() if settings.get('show_output', True) else '')
+                                    e.output.decode() if show_output else '')
+            raise Exception(msg)
+        except subprocess.TimeoutExpired as e:
+            msg = '{}\n\n{}'.format('Test timed out', e.output.decode() if show_output else '')
             raise Exception(msg)
 
     wrapper.__doc__ = '{}'.format(settings.get('name', os.path.basename(dir_name)))
