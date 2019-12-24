@@ -34,12 +34,14 @@ def ZERO_RESULT(msg):
         'leaderboard': ZERO_LEADERBOARD
     }
 
+
 def BAD_FORMAT(file):
-    return ZERO_RESULT('Expecting the file \'{0}\', either no .h file was submitted or filename was not \'{0}\'.'
-            .format(file))
+    return ZERO_RESULT('Required file not submitted: \'{0}\'.'.format(file))
+
 
 def SUBMISSIONS_EXCEEDED(limit):
     return ZERO_RESULT('Exceeded maximum number of submissions: {}'.format(limit))
+
 
 def NUM_SUBMISSIONS_INFO(num, limit):
     return ZERO_RESULT('Submission {} out of {}'.format(num, limit))
@@ -74,14 +76,11 @@ def generate_test(dir_name):
 
     def run_test():
         run_path = os.path.join(gu.Config.TEST_DIR, dir_name, 'run_test')
-        if gu.file_exists(run_path):
-            os.chmod(run_path, os.stat(run_path).st_mode | stat.S_IEXEC)
-            subprocess.check_call(['dos2unix', 'run_test'], cwd=os.path.join(gu.Config.TEST_DIR, dir_name),
-                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            subprocess.check_output(['./run_test'], cwd=os.path.join(gu.Config.TEST_DIR, dir_name),
-                                    stderr=subprocess.STDOUT, timeout=settings.get('timeout', None))
-        else:
-            raise Exception('Test improperly configured: missing \'run_test\' executable')
+        os.chmod(run_path, os.stat(run_path).st_mode | stat.S_IEXEC)
+        subprocess.check_call(['dos2unix', 'run_test'], cwd=os.path.join(gu.Config.TEST_DIR, dir_name),
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.check_output(['./run_test'], cwd=os.path.join(gu.Config.TEST_DIR, dir_name),
+                                stderr=subprocess.STDOUT, timeout=settings.get('timeout', None))
 
     @weight(settings.get('weight', 1))
     def wrapper(self):
@@ -106,6 +105,10 @@ def run_tests(pending_messages):
     #  go through all directories in /tests
     for dr in get_test_dirs():
         LOGGER.info('Test directory discovered: {}'.format(dr))
+        if not gu.file_exists(os.path.join(gu.Config.TEST_DIR, dr, 'run_test')):
+            LOGGER.error('Test improperly configured: missing \'run_test\' executable')
+            exit(-1)
+
         test_fn = generate_test(dr)
         t = Test(test_fn, (unittest.TestCase,), {})
         suite.addTest(t(test_fn.__doc__))
