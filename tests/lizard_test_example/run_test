@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+
+import sys
+import lizard
+
+
+def test(func):
+    fn_name = func.long_name
+
+    #  more than 100 lines of code?
+    if func.nloc > 100:
+        print('Function \'{}\' exceeds 100 lines of code'.format(fn_name))
+        exit(1)
+
+    ccn = func.cyclomatic_complexity
+    #  cyclomatic complexity exceeds 4? (value of 4 used as example)
+    if ccn > 4:
+        print('Function \'{}\' is too complex.'.format(fn_name))
+        print('Observed complexity: {}'.format(ccn))
+        print('Must not exceed: {}'.format(4))
+        exit(1)
+
+    exit(0)
+
+
+if __name__ == "__main__":
+
+    filename = 'file.cpp'
+    function = 'fn'
+
+    info = lizard.analyze_file(filename)
+
+    for fn in info.function_list:
+        if function == fn.name or function == fn.long_name:
+            test(fn)
+
+    exit(1)  # if the function is not found, and test() is not called, test will fail

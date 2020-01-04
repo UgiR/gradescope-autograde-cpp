@@ -52,4 +52,4 @@ individual test directory, these files are found in its parent directory.
 
 ### Example output
 
-![Gradescope output](https://i.imgur.com/abhhxiQ.png)
+![Gradescope output](https://i.imgur.com/Gsb3lMg.png)

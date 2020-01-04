@@ -1,0 +1,5 @@
+weight: 10.0
+name: 'Example cyclomatic complexity test'
+message: 'Your implementation must pass code complexity analysis'
+show_output: true
+timeout: 10
