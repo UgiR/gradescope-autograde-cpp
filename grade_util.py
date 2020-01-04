@@ -32,6 +32,9 @@ def write_predefined_result(file: str):
 
 
 def number_submissions():
+    '''
+    :return: Number of previous submissions. On first submission, will return 0.
+    '''
     with open(Config.SUBMISSION_META_FILE) as file:
         meta = json.load(file)
         return len([submission for submission in meta['previous_submissions'] if float(submission['score']) > 0])

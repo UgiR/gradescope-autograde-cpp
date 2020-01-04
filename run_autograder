@@ -144,7 +144,7 @@ if __name__ == '__main__':
     limit = config.get('limit_submissions', -1)
     LOGGER.info('Using submission limit: {}'.format(limit))
     if limit is not -1:
-        num_submissions = gu.number_submissions()
+        num_submissions = gu.number_submissions() + 1
         if num_submissions > limit:
             LOGGER.info('Submission limit reached. Observed submissions: {}'.format(num_submissions))
             gu.write_result(**SUBMISSIONS_EXCEEDED(limit))
