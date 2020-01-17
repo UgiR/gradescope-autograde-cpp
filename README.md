@@ -1,6 +1,8 @@
 # Gradescope Autograder for C++
 
-[autograder.zip](https://github.com/UgiR/gradescope-autograde-cpp/raw/master/autograder.zip)
+Download v1.0: [autograder.zip](https://github.com/UgiR/gradescope-autograde-cpp/releases/download/v1.0/autograder.zip)
+
+To use new features in the master branch, clone or download this repository.
 
 ### Configuration
 
