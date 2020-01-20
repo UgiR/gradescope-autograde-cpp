@@ -43,6 +43,7 @@ Files:
     message: 'insert() must maintain a balanced BST'  # (default: '')
     show_output: false  # whether to display stdout/stderr output on failure (default: true)
     timeout: 10  # test fails if it does not finish running in 10 seconds (default: null)
+    visibility: hidden  # controls visibility of test case to students (default: visible)
     ```
 
 * Any other files that `run_test` requires.

@@ -12,7 +12,7 @@ import unittest
 import logging
 from typing import List
 
-from gradescope_utils.autograder_utils.decorators import weight
+from gradescope_utils.autograder_utils.decorators import weight, visibility
 from gradescope_utils.autograder_utils.json_test_runner import JSONTestRunner
 
 logging.basicConfig()
@@ -83,6 +83,7 @@ def generate_test(dir_name):
                                 stderr=subprocess.STDOUT, timeout=settings.get('timeout', None))
 
     @weight(settings.get('weight', 1))
+    @visibility(settings.get('visibility', 'visible'))
     def wrapper(self):
         show_output = settings.get('show_output', True)
         try:
@@ -114,7 +115,7 @@ def run_tests(pending_messages):
         suite.addTest(t(test_fn.__doc__))
 
     with open(gu.Config.RESULTS_FILE, 'w+') as result_stream:
-        JSONTestRunner(stdout_visibility='hidden', visibility='visible', stream=result_stream).run(suite)
+        JSONTestRunner(stdout_visibility='hidden', stream=result_stream).run(suite)
 
         LOGGER.info('Adding final score to leaderboard')
         result_stream.seek(0)  # reset file pointer
