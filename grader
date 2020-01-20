@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+import os
+import click
+
+DFL_CONFIG = '''# Uncomment and edit configuration options here
+#weight: 1
+#name: ''
+#message: ''
+#show_output: true
+#timeout: null
+#visibility: visible
+'''
+
+
+@click.group()
+def cli():
+    pass
+
+
+@cli.group()
+def add():
+    pass
+
+
+@add.command()
+@click.option('-d', '--dir-name', required=True)
+def test(dir_name):
+    tests_dir = os.path.join(os.path.curdir, 'tests')
+    if not os.path.exists(tests_dir):
+        click.echo('Error: tests directory not found')
+        return
+
+    new_test_dir = os.path.join(tests_dir, dir_name)
+    os.mkdir(new_test_dir)
+    with open(os.path.join(new_test_dir, 'test.yml'), 'w') as config_file:
+        config_file.write(DFL_CONFIG)
+    with open(os.path.join(new_test_dir, 'run_test'), 'w') as _:
+        pass
+
+
+if __name__ == '__main__':
+    cli()

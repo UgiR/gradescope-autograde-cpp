@@ -48,6 +48,19 @@ Files:
 
 * Any other files that `run_test` requires.
 
+#### CLI
+
+To facilitate the process of writing tests, it is possible to generate new test directories via command line.
+
+Example:
+
+```
+./grader add test -d my_new_test
+```
+
+Executing this command will generate a new directory named "my_new_test" with a pre-populated `config.yml` file and an
+empty `run_test` file.
+
 #### Student submitted files
 
 As specified above, the files listed in `config.yml` are moved into `/autograder/tests`. In the context of any
